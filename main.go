@@ -2,10 +2,10 @@ package main
 
 import (
 	//"fmt"
-	"env"
+	"Env"
 )
 
 func main() {
-	e:=env.NewEnv()
+	e:=Env.NewEnv("hi","hi","hi")
 	e.GetEnv()
 }
