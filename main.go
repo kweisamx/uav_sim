@@ -6,6 +6,6 @@ import (
 )
 
 func main() {
-	e:=Env.NewEnv("hi","hi","hi")
+	e := Env.NewEnv("poisson_distribute.txt", "hi", "hi")
 	e.GetEnv()
 }
