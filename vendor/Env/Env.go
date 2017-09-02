@@ -7,6 +7,10 @@ import (
 	//"Terminal"
 	"UAV"
 	"bufio"
+	//"reflect"
+	"Terminal"
+	"strconv"
+	"strings"
 )
 
 const (
@@ -17,7 +21,7 @@ const (
 type Environment struct {
 	EnvGridSize    int
 	EnvTerminalNum int
-	EnvGrid        Grid.GridVal
+	EnvGrid        [][]Grid.GridVal
 	EnvUav         []UAV.UAVVal
 }
 
@@ -26,32 +30,60 @@ func check(e error) {
 		panic(e)
 	}
 }
-func (e Environment) ReadTermsConfig(filename string) {
+func (e *Environment) InitGrid(grid_size int) {
+	g := make([][]Grid.GridVal, grid_size)
+
+	for i := range g {
+		g[i] = make([]Grid.GridVal, grid_size)
+	}
+	e.EnvGrid = g
+	//fmt.Println(e.EnvGrid)
+	//fmt.Println(len(e.EnvGrid))
+}
+
+func (e *Environment) ReadTermsConfig(filename string) {
 	pwd, _ := os.Getwd() //get the pwd path
 	fmt.Println(pwd)
-	//data, err := ioutil.ReadFile(pwd + "/" + filename)
-	//check(err)
-	//fmt.Println(string(data))
+
 	f, err := os.Open(pwd + "/" + filename)
 	check(err)
 	sc := bufio.NewScanner(f)
-	for sc.Scan() {
-		fmt.Println(sc.Text())
-	}
-	if err := sc.Err(); err != nil {
-		check(err)
-	}
+	sc.Scan()                                   //for scan the infomation
+	info_parse := strings.Split(sc.Text(), " ") //parse
+	e.EnvTerminalNum, err = strconv.Atoi(info_parse[0])
+	e.EnvGridSize, err = strconv.Atoi(info_parse[1])
 
+	//init grid
+	e.InitGrid(e.EnvGridSize)
+	
+	//init Terminal
+	for i := 0; i < e.EnvTerminalNum; i++ {
+		sc.Scan()
+		term_parse := strings.Split(sc.Text(), " ")
+
+		x, _ := strconv.Atoi(term_parse[0])
+		y, _ := strconv.Atoi(term_parse[1])
+		weight, _ := strconv.Atoi(term_parse[2])
+		//fmt.Println(x,y,weight)
+		var t = Terminal.TerminalVal{x, y, weight, false}
+		//fmt.Println(t)
+		e.EnvGrid[x][y].TerminalList = append(e.EnvGrid[x][y].TerminalList,t)
+		//fmt.Println(e.EnvGrid[x][y])
+	}
+	fmt.Println("Terminal Initialization Finished")
 }
 
-func NewEnv(Type string, uavDistri string, UAVtype string) Environment {
+func NewEnv(Type string, uavDistri string, UAVtype string) *Environment {
 	var e Environment
 	e.EnvGridSize = GRID_SIZE
 	e.EnvTerminalNum = TERMIAL_NUM
 	e.ReadTermsConfig(Type)
-	return e
+	//fmt.Println(e.EnvTest[0][0])
+	return &e
 }
 
-func (e Environment) GetEnv() {
+func (e *Environment) GetEnv() {
+	//fmt.Println(e)
 	fmt.Println(e.EnvTerminalNum, e.EnvGridSize)
+	//fmt.Println("")
 }
