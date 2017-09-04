@@ -8,6 +8,7 @@ import (
 	"UAV"
 	"bufio"
 	//"reflect"
+	"Point"
 	"Terminal"
 	"strconv"
 	"strings"
@@ -41,7 +42,7 @@ func (e *Environment) InitGrid(grid_size int) {
 	//fmt.Println(len(e.EnvGrid))
 }
 
-func (e *Environment) ReadTermsConfig(filename string) {
+func (e *Environment) InitTerm(filename string) {
 	pwd, _ := os.Getwd() //get the pwd path
 	fmt.Println(pwd)
 
@@ -55,7 +56,7 @@ func (e *Environment) ReadTermsConfig(filename string) {
 
 	//init grid
 	e.InitGrid(e.EnvGridSize)
-	
+
 	//init Terminal
 	for i := 0; i < e.EnvTerminalNum; i++ {
 		sc.Scan()
@@ -65,25 +66,57 @@ func (e *Environment) ReadTermsConfig(filename string) {
 		y, _ := strconv.Atoi(term_parse[1])
 		weight, _ := strconv.Atoi(term_parse[2])
 		//fmt.Println(x,y,weight)
-		var t = Terminal.TerminalVal{x, y, weight, false}
+		var t = Terminal.TerminalVal{x, y, weight, false, nil}
 		//fmt.Println(t)
-		e.EnvGrid[x][y].TerminalList = append(e.EnvGrid[x][y].TerminalList,t)
+		e.EnvGrid[x][y].TerminalList = append(e.EnvGrid[x][y].TerminalList, t)
+		e.EnvGrid[x][y].TerminalNum += 1
 		//fmt.Println(e.EnvGrid[x][y])
+		//fmt.Println(e.EnvGrid[x][y].TerminalNum,x,y)
 	}
+	f.Close()
 	fmt.Println("Terminal Initialization Finished")
 }
+func (e *Environment) InitUAV(uavDistri string, UAVType string) {
+	if uavDistri == "" || UAVType == "" {
+		err := fmt.Errorf("the argument can't be null")
+		check(err)
+	}
 
-func NewEnv(Type string, uavDistri string, UAVtype string) *Environment {
+	pt, pt_num := Point.GetUAVLocs(uavDistri)
+	uav := make([]UAV.UAVVal, pt_num)
+	for i := 0; i < pt_num; i++ {
+		uav[i].X = pt[i].X
+		uav[i].Y = pt[i].Y
+		uav[i].Z = pt[i].Z
+	}
+	fmt.Println("UAV Initialization Finished")
+}
+func (e *Environment) BindUAVtoTerm() {
+	for i := 0; i < e.EnvGridSize; i++ {
+		for j := 0; j < e.EnvGridSize; j++ {
+			if e.EnvGrid[i][j].TerminalNum != 0 {
+				for k := 0; k < e.EnvGrid[i][j]; k++ {
+					e.EnvGrid[i][j].TerminalList[k]
+				}
+			}
+
+		}
+	}
+
+}
+
+func NewEnv(Type string, uavDistri string, UAVType string) *Environment {
 	var e Environment
 	e.EnvGridSize = GRID_SIZE
 	e.EnvTerminalNum = TERMIAL_NUM
-	e.ReadTermsConfig(Type)
-	//fmt.Println(e.EnvTest[0][0])
+	e.InitTerm(Type)
+	e.InitUAV(uavDistri, UAVType)
+	e.BindUAVtoTerm()
 	return &e
 }
 
 func (e *Environment) GetEnv() {
 	//fmt.Println(e)
-	fmt.Println(e.EnvTerminalNum, e.EnvGridSize)
-	//fmt.Println("")
+	//fmt.Println(e.EnvTerminalNum, e.EnvGridSize)
+	fmt.Println("")
 }

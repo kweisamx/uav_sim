@@ -6,7 +6,7 @@ import (
 )
 
 type GridVal struct {
-	terminal_num int
+	TerminalNum int
 	TerminalList []Terminal.TerminalVal
 }
 
