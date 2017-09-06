@@ -66,7 +66,7 @@ func (e *Environment) InitTerm(filename string) {
 		y, _ := strconv.Atoi(term_parse[1])
 		weight, _ := strconv.Atoi(term_parse[2])
 		//fmt.Println(x,y,weight)
-		var t = Terminal.TerminalVal{x, y, weight, false, nil}
+		var t = Terminal.TerminalVal{x, y, weight, false, nil, nil}
 		//fmt.Println(t)
 		e.EnvGrid[x][y].TerminalList = append(e.EnvGrid[x][y].TerminalList, t)
 		e.EnvGrid[x][y].TerminalNum += 1
@@ -89,19 +89,21 @@ func (e *Environment) InitUAV(uavDistri string, UAVType string) {
 		uav[i].Y = pt[i].Y
 		uav[i].Z = pt[i].Z
 	}
+	e.EnvUav = uav
 	fmt.Println("UAV Initialization Finished")
 }
 func (e *Environment) BindUAVtoTerm() {
 	for i := 0; i < e.EnvGridSize; i++ {
 		for j := 0; j < e.EnvGridSize; j++ {
 			if e.EnvGrid[i][j].TerminalNum != 0 {
-				for k := 0; k < e.EnvGrid[i][j]; k++ {
-					e.EnvGrid[i][j].TerminalList[k]
+				for k := 0; k < len(e.EnvGrid[i][j].TerminalList); k++ {
+					e.EnvGrid[i][j].TerminalList[k].SetUAV(e.EnvUav)
 				}
 			}
 
 		}
 	}
+	fmt.Println("Bind to UAV over")
 
 }
 
