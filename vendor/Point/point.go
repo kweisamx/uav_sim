@@ -14,6 +14,11 @@ type PointVal struct {
 	Z float64
 }
 
+func New(x float64, y float64, z float64) PointVal {
+	p := PointVal{X: x, Y: y, Z: z}
+	return p
+}
+
 func GetUAVLocs(uavDistri string) ([]PointVal, int) {
 	pwd, _ := os.Getwd() //get the pwd path
 	fmt.Println(pwd)
