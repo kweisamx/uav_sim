@@ -18,6 +18,14 @@ func New(x float64, y float64, z float64) PointVal {
 	p := PointVal{X: x, Y: y, Z: z}
 	return p
 }
+func (p *PointVal) Set(inp PointVal) {
+	p.X = inp.X
+	p.Y = inp.Y
+	p.Z = inp.Z
+}
+func (p *PointVal) IsZero() bool {
+	return p.X == 0.0 && p.Y == 0.0 && p.Z == 0.0
+}
 
 func GetUAVLocs(uavDistri string) ([]PointVal, int) {
 	pwd, _ := os.Getwd() //get the pwd path

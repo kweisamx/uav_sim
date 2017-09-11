@@ -51,6 +51,18 @@ func dBmToMiliWatt(dbm float64) float64 {
 	return math.Pow(10, dbm/10)
 }
 
+func (t *TerminalVal) IndexOfLargestPower() int {
+	Largest := 0.000000000000001
+	index := len(t.SignalStrength) - 1
+	for i := len(t.SignalStrength) - 1; i >= 0; i-- {
+		if t.SignalStrength[i] >= Largest {
+			Largest = t.SignalStrength[i]
+			index = i
+		}
+	}
+	return index
+}
+
 func (t *TerminalVal) GetSignalStrenth(uav UAV.UAVVal, mx float64, my float64, mz float64) float64 {
 	uavX := uav.X + mx
 	uavY := uav.Y + my
@@ -86,11 +98,26 @@ func (t *TerminalVal) CollectITF(uavID int) float64 {
 	}
 	return itf
 }
-func (t *TerminalVal) PeekSIR(uavID int , mx float64 , my float64 , mz float64){
+func (t *TerminalVal) PeekSIR(uavID int, mx float64, my float64, mz float64) float64 {
 	interference := t.CollectITF(uavID)
-	t.SignalStrength[uavID] = t.GetSignalStrenth(t.TermUAV[uavID],mx,my,mz)
+	t.SignalStrength[uavID] = t.GetSignalStrenth(t.TermUAV[uavID], mx, my, mz)
 	tmp := t.SignalStrength[uavID]
-	if 
+
+	if t.IndexOfLargestPower() == uavID {
+		t.SignalStrength[uavID] = NOT_INSTIALIZED
+		if MDSP_THRESHOLD && tmp == 0.0 {
+			return 0.0
+		}
+		if interference == 0 {
+			return 15.0
+		} else {
+			return tmp / interference
+		}
+	} else {
+		t.SignalStrength[uavID] = NOT_INSTIALIZED
+		return 0.0
+	}
+
 }
 
 func (t *TerminalVal) SetUAV(e []UAV.UAVVal) {
